@@ -2,6 +2,8 @@ apiVersion: storage.k8s.io/v1beta1
 kind: CSIDriver
 metadata:
   name: {{ .Values.csiDriver.name }}
+  labels:
+    {{- include "helm-csi-driver-nfs.labels" . | nindent 4 }}
 spec:
   attachRequired: false
   volumeLifecycleModes:

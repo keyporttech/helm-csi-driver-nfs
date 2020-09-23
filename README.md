@@ -10,6 +10,7 @@ This chart was developed and tested on kubernetes version 1.19, but should work 
 ## Prerequisites
 
 - A kubernetes cluster 1.14 or later ( most recent release recommended)
+- NFS Client installed on each node in the cluster.
 - helm 3 installation
 - Nodes have enought resources to run the NFS pods.
 - An NFS server and existing accessible shares (confirm that the shares are accessible from one or more of the cluster nodes).
@@ -155,6 +156,7 @@ The following table lists the configurable parameters of this chart and their de
 | `fullnameOverride`                 | Chart and deployment name                            | `csi-driver-nfs-nodeplugin`                                                    |
 | `serviceAccount.name`                 | ServiceAccount name                            | `csi-driver-nfs-nodeplugin`                                                    |
 | `storageClass.name`                 | StorageClass name                            | `csi-driver-nfs-nodeplugin`                                                    |
+| `rbac.enable`                 | Flag to enable ClusterRole and ClusterRoleBinding for the ServiceAccount                             | `true`                                                    |
 
 ## Resources
 

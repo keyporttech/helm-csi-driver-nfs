@@ -46,6 +46,11 @@ storageClass:
   # If the name is not set, a name is generated using the fullname template.
   name: ""
 
+rbac:
+  # Specfies whether ClusterRole and ClusterRoleBinding will be enabled for
+  # the ServiceAccount.
+  enable: true
+
 podAnnotations: {}
 
 podSecurityContext: {}
