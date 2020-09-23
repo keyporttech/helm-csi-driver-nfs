@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ include "helm-csi-driver-nfs.storageClassName" . }}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: {{ .Values.csiDriver.name }}
+reclaimPolicy: Retain
+parameters:
+  storagepolicyname: "NFS CSI Driver"  # Optional Parameter

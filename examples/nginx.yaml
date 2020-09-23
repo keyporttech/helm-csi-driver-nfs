@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: csi-driver-nfs-nodeplugin-pv
+spec:
+  #claimRef:
+  #  name: csi-driver-nfs-nodeplugin-pvc
+  #  namespace: apps
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  storageClassName: csi-driver-nfs-nodeplugin
+  mountOptions:
+    - nfsvers=3
+    - nolock
+    #- hard
+  csi:
+    driver: nfs.csi.k8s.io
+    volumeHandle: nginx-data-id
+    volumeAttributes:
+      # NFS server and mount path i.e. share or its subdirectory
+      # server: IP or FQDN i.e. host.example.com
+      server: 192.168.x.x
+      share: /mnt/Pool/share/csi-dir
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csi-driver-nfs-nodeplugin-pvc
+spec:
+  storageClassName: csi-driver-nfs-nodeplugin
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  #serviceAccount: csi-driver-nfs-nodeplugin
+  containers:
+  - image: maersk/nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+      protocol: TCP
+    volumeMounts:
+      - mountPath: /var/www
+        name: nginx-data-nfs-nodeplugin
+  volumes:
+  - name: nginx-data-nfs-nodeplugin
+    persistentVolumeClaim:
+      claimName: csi-driver-nfs-nodeplugin-pvc
