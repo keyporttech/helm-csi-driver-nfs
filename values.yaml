@@ -19,10 +19,10 @@ csiDriver:
   #   docker pull quay.io/k8scsi/csi-driver-nfs:v2.0.0
   # is failing.
   image:
-    repository: registry.keyporttech.com:30243/csi-driver-nfs
+    repository: registry.keyporttech.com/csi-driver-nfs
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: v2.0.0
+    tag: 2.0.0
   securityContext:
     privileged: true
     capabilities:
