@@ -2,59 +2,71 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# replicaCount -- Number of pods to load balance between
 replicaCount: 1
 
 sidecar:
+  # sidecar.name -- Registrar CSI Driver name
   name: csi-driver-registrar
   image:
+    # sidecar.image.repository -- Repository for the Registrar CSI Driver
     repository: k8s.gcr.io/sig-storage/csi-node-driver-registrar
+    # sidecar.image.pullPolicy -- When the image is pulled
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    # sidecar.image.tag -- Version tag for the image
     tag: v1.3.0
+  # sidecar.securityContext -- Specifies the privilege and access control settings of the container
   securityContext: {}
 
 csiDriver:
+  # csiDriver.name -- NFS CSI Driver name
   name: nfs.csi.k8s.io
-  # Build and push to image registry as pulling
-  #   docker pull quay.io/k8scsi/csi-driver-nfs:v2.0.0
-  # is failing.
   image:
+    # csiDriver.image.repository -- Repository for the NFS CSI Driver
     repository: registry.keyporttech.com/csi-driver-nfs
+    # csiDriver.image.pullPolicy -- When the image is pulled
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    # csiDriver.image.tag -- Version tag for the image
     tag: 2.0.0
   securityContext:
+    # csiDriver.securityContext.privileged -- Does the driver have operating system administrative capabilities
     privileged: true
     capabilities:
+      # csiDriver.securityContext.capabilities.add -- System admininstrator capability
       add: ["SYS_ADMIN"]
+    # csiDriver.securityContext.allowPrivilegeEscalation -- Can the current user context of the container be changed
     allowPrivilegeEscalation: true
-  
+
+# imagePullSecrets -- List of secrets used to pull a private images for the pod
 imagePullSecrets: []
+# nameOverride -- If not empty, replaces the name of the chart 
 nameOverride: ""
+# fullnameOverride -- If not empty, replaces the generated name for the deployment 
 fullnameOverride: csi-driver-nfs-nodeplugin
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # serviceAccount.create -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # serviceAccount.annotations -- List of annotations for the account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template.
+  # serviceAccount.name -- The name of the service account.  If empty, a name is generated.
   name: ""
 
 storageClass:
-  # If the name is not set, a name is generated using the fullname template.
+  # storageClass.name -- Name of the storage class supported by the driver.  If empty, a name is generated.
   name: ""
 
 rbac:
-  # Specfies whether ClusterRole and ClusterRoleBinding will be enabled for
-  # the ServiceAccount.
+  # rbac.enable -- Specfies whether ClusterRole and ClusterRoleBinding will be enabled for ServiceAccount
   enable: true
 
+# podAnnotations -- A list of annotations for the pod
 podAnnotations: {}
 
+# podSecurityContext -- Specifies the privilege and access control settings of the pod
 podSecurityContext: {}
 
+# resources -- Specifies the cpu and memory to be allocated for the pod
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -67,8 +79,11 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# nodeSelector -- List of key-value pairs used to select a node for pod deployment.  In order for the node to be eligible it must have each of the specified key-value pairs as labels.
 nodeSelector: {}
 
+# tolerations -- List of tolerations which allow the pod to be scheduled onto nodes with matching taints
 tolerations: []
 
+# affinity -- List of rules for which nodes the pod is eligible to be scheduled.  This method relies on node labels.
 affinity: {}
