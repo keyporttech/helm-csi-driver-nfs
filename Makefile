@@ -52,6 +52,12 @@ test:
 	@echo "OK"
 .PHONY: test
 
+generate-docs:
+	@echo "generating documentation..."
+	@echo "generating README.md"
+	helm-docs --chart-search-root=./ --template-files=./README.md.gotmpl --template-files=./_templates.gotmpl --output-file=./README.md --log-level=trace
+.PHONY: generate-docs
+
 build: check-version lint test
 .PHONY: build
 

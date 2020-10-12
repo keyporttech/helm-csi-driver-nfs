@@ -1,21 +1,28 @@
-# helm-csi-driver-nfs
+{{ define "extra.logo" -}}
+```
+          ,-.
+ ,     ,-.   ,-.
+/ \   (   )-(   )
+\ |  ,.>-(   )-<
+ \|,' (   )-(   )
+  Y ___`-'   `-'
+  |/__/   `-'
+  |
+  |
+  |    -hi-
+__|_____________
+```
+{{- end }}
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0](https://img.shields.io/badge/AppVersion-2.0.0-informational?style=flat-square)
-
-A Kubnetes Helm chart that mounts NFS volumes hosted on a remote server.
-
-**Homepage:** <https://github.com/keyporttech/helm-charts>
-
+{{ define "extra.introduction" -}}
 ## Introduction
 
 This Kubernetes helm chart allows the management of Network File System (NFS) storage.  It does this by deploying, to each node in the cluster, a pod running both the driver and CSI Node Driver Registrar sidecar containers.  Applications can access existing NFS shares by simply specifying a Persistent Volume (PV) and Persistent Volume Claim (PVC).
 
 This chart was developed and tested on kubernetes version 1.19, but should work on earlier or later versions.
+{{- end }}
 
-## Requirements
-
-Kubernetes: `>=1.14`
-
+{{ define "extra.requirementsSection" -}}
 * helm 3 installation
 * Nodes have enought resources to run the chart pod.
 * Any one namespace to deploy into.
@@ -26,14 +33,16 @@ Images:
 
 * Node Driver Registrar: https://github.com/kubernetes-csi/node-driver-registrar
 * CSI NFS driver: https://github.com/kubernetes-csi/csi-driver-nfs
+{{- end }}
 
+{{ define "extra.chartInstallation" -}}
 ## Installing the Chart
 
 There are two methods that can be used to install the chart.  The first is to use the chart from the Keyporttech Helm Repository.
 
 ```console
 helm repo add keyporttech https://keyporttech.github.io/helm-charts/
-helm install my-release keyporttech/helm-csi-driver-nfs -n my-namespace
+helm install my-release keyporttech/{{ template "chart.name" . }} -n my-namespace
 ```
 or clone this repo and install from the local file system.
 
@@ -42,7 +51,9 @@ $ helm install my-release . -n my-namespace
 ```
 > **Tip**: There should not be a need to modify any of the chart values.  Use the default [values.yaml](values.yaml) file.
 >
+{{- end }}
 
+{{ define "extra.chartUninstall" -}}
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
@@ -52,7 +63,9 @@ $ helm uninstall my-release -n my-namespace
 ```
 
 All resources associated with the last release of the chart as well as its release history will be deleted.
+{{- end }}
 
+{{ define "extra.storage" -}}
 ## Storage
 
 This chart enables applications to access existing NFS shares through PVs and PVCs.  By default no shares will be deleted when the chart is uninstalled.
@@ -65,6 +78,7 @@ See nginx pod example below.  The following may need to change:
 * PV and PVC name
 * PV and PVC storage size
 * PV mountOptions and volumeAttributes
+
 
 ```yaml
 apiVersion: v1
@@ -128,50 +142,10 @@ spec:
       claimName: csi-driver-nfs-nodeplugin-pvc
 ```
 This will enable direct communication between the NFS server and the CSI Driver running in the cluster.
+{{- end }}
 
-## Values
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| affinity | object | `{}` | List of rules for which nodes the pod is eligible to be scheduled.  This method relies on node labels. |
-| csiDriver.image.pullPolicy | string | `"IfNotPresent"` | When the image is pulled |
-| csiDriver.image.repository | string | `"registry.keyporttech.com/csi-driver-nfs"` | Repository for the NFS CSI Driver |
-| csiDriver.image.tag | string | `"2.0.0"` | Version tag for the image |
-| csiDriver.name | string | `"nfs.csi.k8s.io"` | NFS CSI Driver name |
-| csiDriver.securityContext.allowPrivilegeEscalation | bool | `true` | Can the current user context of the container be changed |
-| csiDriver.securityContext.capabilities.add | list | `["SYS_ADMIN"]` | System admininstrator capability |
-| csiDriver.securityContext.privileged | bool | `true` | Does the driver have operating system administrative capabilities |
-| fullnameOverride | string | `"csi-driver-nfs-nodeplugin"` | If not empty, replaces the generated name for the deployment  |
-| imagePullSecrets | list | `[]` | List of secrets used to pull a private images for the pod |
-| nameOverride | string | `""` | If not empty, replaces the name of the chart  |
-| nodeSelector | object | `{}` | List of key-value pairs used to select a node for pod deployment.  In order for the node to be eligible it must have each of the specified key-value pairs as labels. |
-| podAnnotations | object | `{}` | A list of annotations for the pod |
-| podSecurityContext | object | `{}` | Specifies the privilege and access control settings of the pod |
-| rbac.enable | bool | `true` | Specfies whether ClusterRole and ClusterRoleBinding will be enabled for ServiceAccount |
-| replicaCount | int | `1` | Number of pods to load balance between |
-| resources | object | `{}` | Specifies the cpu and memory to be allocated for the pod |
-| serviceAccount.annotations | object | `{}` | List of annotations for the account |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `""` | The name of the service account.  If empty, a name is generated. |
-| sidecar.image.pullPolicy | string | `"IfNotPresent"` | When the image is pulled |
-| sidecar.image.repository | string | `"k8s.gcr.io/sig-storage/csi-node-driver-registrar"` | Repository for the Registrar CSI Driver |
-| sidecar.image.tag | string | `"v1.3.0"` | Version tag for the image |
-| sidecar.name | string | `"csi-driver-registrar"` | Registrar CSI Driver name |
-| sidecar.securityContext | object | `{}` | Specifies the privilege and access control settings of the container |
-| storageClass.name | string | `""` | Name of the storage class supported by the driver.  If empty, a name is generated. |
-| tolerations | list | `[]` | List of tolerations which allow the pod to be scheduled onto nodes with matching taints |
-
-## Source Code
-
-* <https://github.com/keyporttech/helm-csi-driver-nfs>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Keyport Technologies, Inc. | support@keyporttech.com | https://keyporttech.github.io/ |
-
+{{ define "extra.contributing" -}}
 ## Contributing
 
 Please see [keyporttech charts contribution guidelines](https://github.com/keyporttech/helm-charts/blob/master/CONTRIBUTING.md)
-
+{{- end }}

@@ -1,6 +1,6 @@
 apiVersion: v2
 name: helm-csi-driver-nfs
-description: A Helm chart for Kubernetes that mounts NFS volumes hosted on a remote server.
+description: A Kubnetes Helm chart that mounts NFS volumes hosted on a remote server.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -21,3 +21,18 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 appVersion: 2.0.0
+
+# Additional fields used in generating README.md
+engine: gotpl
+deprecated: false
+home: "https://github.com/keyporttech/helm-charts"
+maintainers:
+  - email: support@keyporttech.com
+    name: Keyport Technologies, Inc.
+    url: https://keyporttech.github.io/
+sources: ["https://github.com/keyporttech/helm-csi-driver-nfs"]
+kubeVersion: ">=1.14"
+#dependencies:
+#  - name: 
+#    version: 
+#    repository: 
