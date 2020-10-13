@@ -39,9 +39,9 @@ csiDriver:
 
 # imagePullSecrets -- List of secrets used to pull a private images for the pod
 imagePullSecrets: []
-# nameOverride -- If not empty, replaces the name of the chart 
+# nameOverride -- If not empty, replaces the name of the chart
 nameOverride: ""
-# fullnameOverride -- If not empty, replaces the generated name for the deployment 
+# fullnameOverride -- If not empty, replaces the generated name for the deployment
 fullnameOverride: csi-driver-nfs-nodeplugin
 
 serviceAccount:

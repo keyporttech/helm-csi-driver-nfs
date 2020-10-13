@@ -32,7 +32,7 @@ maintainers:
     url: https://keyporttech.github.io/
 sources: ["https://github.com/keyporttech/helm-csi-driver-nfs"]
 kubeVersion: ">=1.14"
-#dependencies:
-#  - name: 
-#    version: 
-#    repository: 
+# dependencies:
+#   - name:
+#     version:
+#     repository:
