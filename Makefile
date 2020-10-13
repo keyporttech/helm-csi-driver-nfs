@@ -58,7 +58,7 @@ generate-docs:
 	helm-docs --chart-search-root=./ --template-files=./README.md.gotmpl --template-files=./_templates.gotmpl --output-file=./README.md --log-level=trace
 .PHONY: generate-docs
 
-build: check-version lint test
+build: check-version lint test generate-docs
 .PHONY: build
 
 publish-local-registry:
