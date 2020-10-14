@@ -52,10 +52,6 @@ serviceAccount:
   # serviceAccount.name -- The name of the service account.  If empty, a name is generated.
   name: ""
 
-storageClass:
-  # storageClass.name -- Name of the storage class supported by the driver.  If empty, a name is generated.
-  name: ""
-
 rbac:
   # rbac.enable -- Specfies whether ClusterRole and ClusterRoleBinding will be enabled for ServiceAccount
   enable: true

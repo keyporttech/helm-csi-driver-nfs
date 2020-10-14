@@ -55,22 +55,34 @@ All resources associated with the last release of the chart as well as its relea
 
 ## Storage
 
-This chart enables applications to access existing NFS shares through PVs and PVCs.  By default no shares will be deleted when the chart is uninstalled.
+This chart enables applications to access existing NFS shares through SCs, PVs and PVCs.  By default no shares will be deleted when the chart is uninstalled.
 
-In the repository root folder there is a examples subfolder containing the nginx web server.  It shows how to create a pv and pvc outside the chart so that an application can mount an existing NFS share.
+In the repository root folder there is a examples subfolder containing the nginx web server.  It shows how to create a sc, pv and pvc outside the chart so that an application can mount an existing NFS share.
 
 Applications do not have to be installed into the same namespace as this chart.  Already deployed applications can remain in their current namespace and be updated to use the driver.
 
 See nginx pod example below.  The following may need to change:
-* PV and PVC name
+* SC, PV and PVC name
 * PV and PVC storage size
 * PV mountOptions and volumeAttributes
 
 ```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-driver-nfs-nodeplugin-nginx-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: nfs.csi.k8s.io
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  storagepolicyname: "NFS CSI Driver"  # Optional Parameter
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: csi-driver-nfs-nodeplugin-pv
+  name: csi-driver-nfs-nodeplugin-nginx-pv
 spec:
   #claimRef:
   #  name: csi-driver-nfs-nodeplugin-pvc
@@ -81,7 +93,7 @@ spec:
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
-  storageClassName: csi-driver-nfs-nodeplugin
+  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
   mountOptions:
     - nfsvers=3
     - nolock
@@ -92,15 +104,15 @@ spec:
     volumeAttributes:
       # NFS server and mount path i.e. share or its subdirectory
       # server: IP or FQDN i.e. host.example.com
-      server: 192.168.x.x
-      share: /mnt/Pool/share/csi-dir
+      server: 10.10.1.12
+      share: mnt/Pool2/Virtualization/Kubernetes/Applications/csi-dir
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: csi-driver-nfs-nodeplugin-pvc
+  name: csi-driver-nfs-nodeplugin-nginx-pvc
 spec:
-  storageClassName: csi-driver-nfs-nodeplugin
+  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
   accessModes:
   - ReadWriteMany
   resources:
@@ -125,7 +137,7 @@ spec:
   volumes:
   - name: nginx-data-nfs-nodeplugin
     persistentVolumeClaim:
-      claimName: csi-driver-nfs-nodeplugin-pvc
+      claimName: csi-driver-nfs-nodeplugin-nginx-pvc
 ```
 This will enable direct communication between the NFS server and the CSI Driver running in the cluster.
 
@@ -141,9 +153,9 @@ This will enable direct communication between the NFS server and the CSI Driver 
 | csiDriver.securityContext.allowPrivilegeEscalation | bool | `true` | Can the current user context of the container be changed |
 | csiDriver.securityContext.capabilities.add | list | `["SYS_ADMIN"]` | System admininstrator capability |
 | csiDriver.securityContext.privileged | bool | `true` | Does the driver have operating system administrative capabilities |
-| fullnameOverride | string | `"csi-driver-nfs-nodeplugin"` | If not empty, replaces the generated name for the deployment  |
+| fullnameOverride | string | `"csi-driver-nfs-nodeplugin"` | If not empty, replaces the generated name for the deployment |
 | imagePullSecrets | list | `[]` | List of secrets used to pull a private images for the pod |
-| nameOverride | string | `""` | If not empty, replaces the name of the chart  |
+| nameOverride | string | `""` | If not empty, replaces the name of the chart |
 | nodeSelector | object | `{}` | List of key-value pairs used to select a node for pod deployment.  In order for the node to be eligible it must have each of the specified key-value pairs as labels. |
 | podAnnotations | object | `{}` | A list of annotations for the pod |
 | podSecurityContext | object | `{}` | Specifies the privilege and access control settings of the pod |
@@ -158,7 +170,6 @@ This will enable direct communication between the NFS server and the CSI Driver 
 | sidecar.image.tag | string | `"v1.3.0"` | Version tag for the image |
 | sidecar.name | string | `"csi-driver-registrar"` | Registrar CSI Driver name |
 | sidecar.securityContext | object | `{}` | Specifies the privilege and access control settings of the container |
-| storageClass.name | string | `""` | Name of the storage class supported by the driver.  If empty, a name is generated. |
 | tolerations | list | `[]` | List of tolerations which allow the pod to be scheduled onto nodes with matching taints |
 
 ## Source Code

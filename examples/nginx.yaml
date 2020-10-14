@@ -1,7 +1,19 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-driver-nfs-nodeplugin-nginx-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: nfs.csi.k8s.io
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  storagepolicyname: "NFS CSI Driver"  # Optional Parameter
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: csi-driver-nfs-nodeplugin-pv
+  name: csi-driver-nfs-nodeplugin-nginx-pv
 spec:
   #claimRef:
   #  name: csi-driver-nfs-nodeplugin-pvc
@@ -12,7 +24,7 @@ spec:
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
-  storageClassName: csi-driver-nfs-nodeplugin
+  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
   mountOptions:
     - nfsvers=3
     - nolock
@@ -29,9 +41,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: csi-driver-nfs-nodeplugin-pvc
+  name: csi-driver-nfs-nodeplugin-nginx-pvc
 spec:
-  storageClassName: csi-driver-nfs-nodeplugin
+  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
   accessModes:
   - ReadWriteMany
   resources:
@@ -56,4 +68,4 @@ spec:
   volumes:
   - name: nginx-data-nfs-nodeplugin
     persistentVolumeClaim:
-      claimName: csi-driver-nfs-nodeplugin-pvc
+      claimName: csi-driver-nfs-nodeplugin-nginx-pvc
