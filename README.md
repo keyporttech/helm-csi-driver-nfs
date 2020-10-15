@@ -1,4 +1,4 @@
-# helm-csi-driver-nfs
+# csi-driver-nfs
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0](https://img.shields.io/badge/AppVersion-2.0.0-informational?style=flat-square)
 
@@ -8,7 +8,7 @@ A Kubnetes Helm chart that mounts NFS volumes hosted on a remote server.
 
 ## Introduction
 
-This Kubernetes helm chart allows the management of Network File System (NFS) storage.  It does this by deploying, to each node in the cluster, a pod running both the driver and CSI Node Driver Registrar sidecar containers.  Applications can access existing NFS shares by simply specifying a Persistent Volume (PV) and Persistent Volume Claim (PVC).
+This Kubernetes helm chart allows the management of Network File System (NFS) storage.  It does this by deploying, to each node in the cluster, a pod running both the driver and CSI Node Driver Registrar sidecar containers.  Applications can access existing NFS shares by simply specifying a Storage Class (SC), Persistent Volume (PV) and Persistent Volume Claim (PVC).
 
 This chart was developed and tested on kubernetes version 1.19, but should work on earlier or later versions.
 
@@ -29,19 +29,22 @@ Images:
 
 ## Installing the Chart
 
-There are two methods that can be used to install the chart.  The first is to use the chart from the Keyporttech Helm Repository.
+There are two methods that can be used to install the chart.
+
+Use the chart from the Keyporttech Helm Repository
 
 ```console
 helm repo add keyporttech https://keyporttech.github.io/helm-charts/
-helm install my-release keyporttech/helm-csi-driver-nfs -n my-namespace
+helm install my-release keyporttech/csi-driver-nfs -n my-namespace
 ```
 or clone this repo and install from the local file system.
 
 ```console
 $ helm install my-release . -n my-namespace
 ```
+Only a single instance of the NFS CSI Driver can exist in a cluster so only one helm release of the chart is permissible.
+
 > **Tip**: There should not be a need to modify any of the chart values.  Use the default [values.yaml](values.yaml) file.
->
 
 ## Uninstalling the Chart
 
@@ -70,7 +73,7 @@ See nginx pod example below.  The following may need to change:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: csi-driver-nfs-nodeplugin-nginx-sc
+  name: csi-driver-nfs-nginx-sc
   annotations:
     storageclass.kubernetes.io/is-default-class: "false"
 provisioner: nfs.csi.k8s.io
@@ -82,10 +85,10 @@ parameters:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: csi-driver-nfs-nodeplugin-nginx-pv
+  name: csi-driver-nfs-nginx-pv
 spec:
   #claimRef:
-  #  name: csi-driver-nfs-nodeplugin-pvc
+  #  name: csi-driver-nfs-nginx-pvc
   #  namespace: apps
   accessModes:
   - ReadWriteMany
@@ -93,7 +96,7 @@ spec:
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
-  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
+  storageClassName: csi-driver-nfs-nginx-sc
   mountOptions:
     - nfsvers=3
     - nolock
@@ -104,15 +107,15 @@ spec:
     volumeAttributes:
       # NFS server and mount path i.e. share or its subdirectory
       # server: IP or FQDN i.e. host.example.com
-      server: 10.10.1.12
-      share: mnt/Pool2/Virtualization/Kubernetes/Applications/csi-dir
+      server: 192.168.x.x
+      share: /mnt/pool/share/csi-dir
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: csi-driver-nfs-nodeplugin-nginx-pvc
+  name: csi-driver-nfs-nginx-pvc
 spec:
-  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
+  storageClassName: csi-driver-nfs-nginx-sc
   accessModes:
   - ReadWriteMany
   resources:
@@ -133,11 +136,11 @@ spec:
       protocol: TCP
     volumeMounts:
       - mountPath: /var/www
-        name: nginx-data-nfs-nodeplugin
+        name: nginx-data-nfs
   volumes:
-  - name: nginx-data-nfs-nodeplugin
+  - name: nginx-data-nfs
     persistentVolumeClaim:
-      claimName: csi-driver-nfs-nodeplugin-nginx-pvc
+      claimName: csi-driver-nfs-nginx-pvc
 ```
 This will enable direct communication between the NFS server and the CSI Driver running in the cluster.
 
@@ -146,29 +149,30 @@ This will enable direct communication between the NFS server and the CSI Driver 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | List of rules for which nodes the pod is eligible to be scheduled.  This method relies on node labels. |
+| csiDriver.csiDriverName | string | `"nfs.csi.k8s.io"` | NFS CSI Driver name hardcoded in executable |
 | csiDriver.image.pullPolicy | string | `"IfNotPresent"` | When the image is pulled |
 | csiDriver.image.repository | string | `"registry.keyporttech.com/csi-driver-nfs"` | Repository for the NFS CSI Driver |
 | csiDriver.image.tag | string | `"2.0.0"` | Version tag for the image |
-| csiDriver.name | string | `"nfs.csi.k8s.io"` | NFS CSI Driver name |
+| csiDriver.name | string | `"csi-driver-nfs"` | NFS CSI Driver container name |
 | csiDriver.securityContext.allowPrivilegeEscalation | bool | `true` | Can the current user context of the container be changed |
 | csiDriver.securityContext.capabilities.add | list | `["SYS_ADMIN"]` | System admininstrator capability |
 | csiDriver.securityContext.privileged | bool | `true` | Does the driver have operating system administrative capabilities |
-| fullnameOverride | string | `"csi-driver-nfs-nodeplugin"` | If not empty, replaces the generated name for the deployment |
+| fullnameOverride | string | `""` | If not empty, replaces the generated name for the deployment |
 | imagePullSecrets | list | `[]` | List of secrets used to pull a private images for the pod |
 | nameOverride | string | `""` | If not empty, replaces the name of the chart |
 | nodeSelector | object | `{}` | List of key-value pairs used to select a node for pod deployment.  In order for the node to be eligible it must have each of the specified key-value pairs as labels. |
 | podAnnotations | object | `{}` | A list of annotations for the pod |
 | podSecurityContext | object | `{}` | Specifies the privilege and access control settings of the pod |
-| rbac.enable | bool | `true` | Specfies whether ClusterRole and ClusterRoleBinding will be enabled for ServiceAccount |
+| rbac.enable | bool | `false` | Specfies whether ClusterRole and ClusterRoleBinding will be enabled for ServiceAccount |
 | replicaCount | int | `1` | Number of pods to load balance between |
 | resources | object | `{}` | Specifies the cpu and memory to be allocated for the pod |
 | serviceAccount.annotations | object | `{}` | List of annotations for the account |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account.  If empty, a name is generated. |
 | sidecar.image.pullPolicy | string | `"IfNotPresent"` | When the image is pulled |
 | sidecar.image.repository | string | `"k8s.gcr.io/sig-storage/csi-node-driver-registrar"` | Repository for the Registrar CSI Driver |
 | sidecar.image.tag | string | `"v1.3.0"` | Version tag for the image |
-| sidecar.name | string | `"csi-driver-registrar"` | Registrar CSI Driver name |
+| sidecar.name | string | `"csi-driver-registrar"` | Registrar CSI Driver container name |
 | sidecar.securityContext | object | `{}` | Specifies the privilege and access control settings of the container |
 | tolerations | list | `[]` | List of tolerations which allow the pod to be scheduled onto nodes with matching taints |
 

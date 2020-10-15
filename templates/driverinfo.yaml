@@ -1,11 +1,13 @@
-apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 kind: CSIDriver
 metadata:
-  name: {{ .Values.csiDriver.name }}
+  name: {{ .Values.csiDriver.csiDriverName }}
   labels:
     {{- include "helm-csi-driver-nfs.labels" . | nindent 4 }}
 spec:
   attachRequired: false
+  podInfoOnMount: true
+  fsGroupPolicy: ReadWriteOnceWithFSType
   volumeLifecycleModes:
   - Persistent
-  podInfoOnMount: true
+

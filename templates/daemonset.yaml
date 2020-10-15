@@ -33,10 +33,10 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh", "-c", "rm -rf /registration/{{ .Values.csiDriver.name }} /registration/{{ .Values.csiDriver.name }}-reg.sock"]
+                command: ["/bin/sh", "-c", "rm -rf /registration/{{ include "helm-csi-driver-nfs.fullname" . }} /registration/{{ include "helm-csi-driver-nfs.fullname" . }}-reg.sock"]
           args:
             - "--csi-address=/plugin/csi.sock"
-            - "--kubelet-registration-path=/var/lib/kubelet/plugins/{{ .Values.csiDriver.name }}/csi.sock"
+            - "--kubelet-registration-path=/var/lib/kubelet/plugins/{{ include "helm-csi-driver-nfs.fullname" . }}/csi.sock"
           env:
             - name: KUBE_NODE_NAME
               valueFrom:
@@ -49,7 +49,7 @@ spec:
               mountPath: /registration
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-        - name: {{ include "helm-csi-driver-nfs.fullname" . }}
+        - name: {{ .Values.csiDriver.name }}
           image: "{{ .Values.csiDriver.image.repository }}:{{ .Values.csiDriver.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: "IfNotPresent"
           securityContext:
@@ -73,7 +73,7 @@ spec:
       volumes:
         - name: plugin-dir
           hostPath:
-            path: /var/lib/kubelet/plugins/{{ .Values.csiDriver.name }}
+            path: /var/lib/kubelet/plugins/{{ include "helm-csi-driver-nfs.fullname" . }}
             type: DirectoryOrCreate
         - name: pods-mount-dir
           hostPath:

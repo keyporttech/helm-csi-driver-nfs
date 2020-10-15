@@ -1,7 +1,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: csi-driver-nfs-nodeplugin-nginx-sc
+  name: csi-driver-nfs-nginx-sc
   annotations:
     storageclass.kubernetes.io/is-default-class: "false"
 provisioner: nfs.csi.k8s.io
@@ -13,10 +13,10 @@ parameters:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: csi-driver-nfs-nodeplugin-nginx-pv
+  name: csi-driver-nfs-nginx-pv
 spec:
   #claimRef:
-  #  name: csi-driver-nfs-nodeplugin-pvc
+  #  name: csi-driver-nfs-nginx-pvc
   #  namespace: apps
   accessModes:
   - ReadWriteMany
@@ -24,7 +24,7 @@ spec:
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
-  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
+  storageClassName: csi-driver-nfs-nginx-sc
   mountOptions:
     - nfsvers=3
     - nolock
@@ -36,14 +36,14 @@ spec:
       # NFS server and mount path i.e. share or its subdirectory
       # server: IP or FQDN i.e. host.example.com
       server: 192.168.x.x
-      share: /mnt/Pool/share/csi-dir
+      share: /mnt/pool/share/csi-dir
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: csi-driver-nfs-nodeplugin-nginx-pvc
+  name: csi-driver-nfs-nginx-pvc
 spec:
-  storageClassName: csi-driver-nfs-nodeplugin-nginx-sc
+  storageClassName: csi-driver-nfs-nginx-sc
   accessModes:
   - ReadWriteMany
   resources:
@@ -64,8 +64,8 @@ spec:
       protocol: TCP
     volumeMounts:
       - mountPath: /var/www
-        name: nginx-data-nfs-nodeplugin
+        name: nginx-data-nfs
   volumes:
-  - name: nginx-data-nfs-nodeplugin
+  - name: nginx-data-nfs
     persistentVolumeClaim:
-      claimName: csi-driver-nfs-nodeplugin-nginx-pvc
+      claimName: csi-driver-nfs-nginx-pvc
