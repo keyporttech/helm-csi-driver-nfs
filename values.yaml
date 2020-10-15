@@ -25,7 +25,7 @@ csiDriver:
   name: csi-driver-nfs
   image:
     # csiDriver.image.repository -- Repository for the NFS CSI Driver
-    repository: registry.keyporttech.com/csi-driver-nfs
+    repository: keyporttech/csi-driver-nfs
     # csiDriver.image.pullPolicy -- When the image is pulled
     pullPolicy: IfNotPresent
     # csiDriver.image.tag -- Version tag for the image
