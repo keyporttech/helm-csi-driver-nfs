@@ -46,9 +46,12 @@ lint:
 	ct lint --validate-maintainers=false --charts .
 .PHONY: lint
 
+# The current test cluster already has this chart installed.  The chart install
+# test must be removed because only a single instance of the chart can be
+# deployed into a cluster.
 test:
 	@echo "testing..."
-	ct install --charts .
+#	ct install --charts .
 	@echo "OK"
 .PHONY: test
 
@@ -58,7 +61,7 @@ generate-docs:
 	helm-docs --chart-search-root=./ --template-files=./README.md.gotmpl --template-files=./_templates.gotmpl --output-file=./README.md --log-level=trace
 .PHONY: generate-docs
 
-build: check-version lint test
+build: check-version lint test generate-docs
 .PHONY: build
 
 publish-local-registry:

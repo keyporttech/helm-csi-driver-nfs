@@ -25,7 +25,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: {{ include "helm-csi-driver-nfs.serviceAccountName" . }}
-    namespace: default
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: {{ include "helm-csi-driver-nfs.fullname" . }}

@@ -6,7 +6,7 @@
 replicaCount: 1
 
 sidecar:
-  # sidecar.name -- Registrar CSI Driver name
+  # sidecar.name -- Registrar CSI Driver container name
   name: csi-driver-registrar
   image:
     # sidecar.image.repository -- Repository for the Registrar CSI Driver
@@ -19,8 +19,10 @@ sidecar:
   securityContext: {}
 
 csiDriver:
-  # csiDriver.name -- NFS CSI Driver name
-  name: nfs.csi.k8s.io
+  # csiDriver.csiDriverName -- NFS CSI Driver name hardcoded in executable
+  csiDriverName: nfs.csi.k8s.io
+  # csiDriver.name -- NFS CSI Driver container name
+  name: csi-driver-nfs
   image:
     # csiDriver.image.repository -- Repository for the NFS CSI Driver
     repository: registry.keyporttech.com/csi-driver-nfs
@@ -39,26 +41,22 @@ csiDriver:
 
 # imagePullSecrets -- List of secrets used to pull a private images for the pod
 imagePullSecrets: []
-# nameOverride -- If not empty, replaces the name of the chart 
+# nameOverride -- If not empty, replaces the name of the chart
 nameOverride: ""
-# fullnameOverride -- If not empty, replaces the generated name for the deployment 
-fullnameOverride: csi-driver-nfs-nodeplugin
+# fullnameOverride -- If not empty, replaces the generated name for the deployment
+fullnameOverride: ""
 
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created
-  create: true
+  create: false
   # serviceAccount.annotations -- List of annotations for the account
   annotations: {}
   # serviceAccount.name -- The name of the service account.  If empty, a name is generated.
   name: ""
 
-storageClass:
-  # storageClass.name -- Name of the storage class supported by the driver.  If empty, a name is generated.
-  name: ""
-
 rbac:
   # rbac.enable -- Specfies whether ClusterRole and ClusterRoleBinding will be enabled for ServiceAccount
-  enable: true
+  enable: false
 
 # podAnnotations -- A list of annotations for the pod
 podAnnotations: {}
