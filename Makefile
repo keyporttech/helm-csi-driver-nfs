@@ -74,7 +74,7 @@ publish-local-registry:
 .PHONY: publish-local-registry
 
 publish-public-repository:
-	#docker run -e GITHUB_TOKEN=${GITHUB_TOKEN} -v `pwd`:/charts/$(CHART) registry.keyporttech.com:30243/chart-testing:0.1.4 bash -cx " \
+	#docker run -e GITHUB_TOKEN=${GITHUB_TOKEN} -v `pwd`:/charts/$(CHART) registry.keyporttech.com/chart-testing:0.1.4 bash -cx " \
 	#echo $GITHUB_TOKEN; \
 	rm -f *.tgz
 	helm package .;
@@ -87,7 +87,7 @@ deploy: publish-local-registry publish-public-repository
 	rm -rf /tmp/helm-$(CHART)
 	rm -rf helm-charts
 	git clone git@github.com:keyporttech/helm-$(CHART).git /tmp/helm-$(CHART)
-	cd /tmp/helm-$(CHART) && git remote add downstream ssh://git@git.keyporttech.com:30222/keyporttech/helm-$(CHART).git
+	cd /tmp/helm-$(CHART) && git remote add downstream ssh://git@git.keyporttech.com/keyporttech/helm-$(CHART).git
 	cd /tmp/helm-$(CHART) && git config --global user.email "bot@keyporttech.com"
 	cd /tmp/helm-$(CHART) && git config --global user.name "keyporttech-bot"
 	cd /tmp/helm-$(CHART) && git fetch downstream master
