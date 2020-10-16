@@ -87,10 +87,10 @@ deploy: publish-local-registry publish-public-repository
 	rm -rf /tmp/helm-$(CHART)
 	rm -rf helm-charts
 	git clone git@github.com:keyporttech/helm-$(CHART).git /tmp/helm-$(CHART)
-	cd /tmp/helm-$(CHART) && git remote add downstream ssh://git@git.keyporttech.com/keyporttech/helm-$(CHART).git
+	cd /tmp/helm-$(CHART) && git remote add downstream ssh://git@ssh.git.keyporttech.com/keyporttech/helm-$(CHART).git
 	cd /tmp/helm-$(CHART) && git config --global user.email "bot@keyporttech.com"
 	cd /tmp/helm-$(CHART) && git config --global user.name "keyporttech-bot"
 	cd /tmp/helm-$(CHART) && git fetch downstream master
 	cd /tmp/helm-$(CHART) && git fetch origin
-	cd /tmp/helm-$(CHART) && git push -u origin downstream/master:master --force-with-lease
+	cd /tmp/helm-$(CHART) && git push -u origin downstream/master:main --force-with-lease
 .PHONY:deploy
